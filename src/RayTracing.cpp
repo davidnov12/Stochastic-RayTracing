@@ -1,14 +1,29 @@
 #include "RayTracing.h"
+#include "CameraCallbacks.h"
 
 void RayTracing::run(){
 
 	while (!w.isClosed()) {
+
+		float current = static_cast<float>(glfwGetTime());
+		delta = current - last;
+		last = current;
+		key_callback(w.getWindow());
 
 		ge::gl::glClearColor(0, 1, 0.7, 1);
 		ge::gl::glClear(GL_COLOR_BUFFER_BIT);
 
 		// Ray trace
 		tracer->use();
+		
+		std::vector<glm::vec3> sp = c.getScreenCoords();
+		glm::vec3 spx = sp[2] - sp[0];
+		glm::vec3 spy = sp[1] - sp[0];
+		tracer->set3f("screen_plane[0]", spx.x, spx.y, spx.z);
+		tracer->set3f("screen_plane[1]", spy.x, spy.y, spy.z);
+		tracer->set3f("screen_plane[2]", sp[0].x, sp[0].y, sp[0].z);
+		tracer->set3f("view_pos", c.getPosition().x, c.getPosition().y, c.getPosition().z);
+
 		geomBuff->bindBase(GL_SHADER_STORAGE_BUFFER, 0);
 		matBuff->bindBase(GL_SHADER_STORAGE_BUFFER, 2);
 		renderBuff->bindBase(GL_SHADER_STORAGE_BUFFER, 1);
@@ -62,6 +77,8 @@ void RayTracing::rayTrace(){
 }
 
 void RayTracing::init(){
+
+	w.setMouseCallback(mouse_callback);
 
 	std::ifstream is;
 

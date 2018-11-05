@@ -9,6 +9,7 @@
 #include <GLFW/glfw3.h>
 
 
+
 class Window {
 
 public:
@@ -48,6 +49,17 @@ public:
 	*/
 	GLFWwindow* getWindow();
 
+	/*
+	*/
+	void initGUI();
+
+	/*
+	*/
+	void renderGUI();
+
+	/*
+	*/
+	void destroyGUI();
 
 	/**
 	* \brief function to get window width

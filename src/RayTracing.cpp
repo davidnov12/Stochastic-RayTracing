@@ -42,13 +42,15 @@ void RayTracing::run(){
 		// Draw frame
 		display->use();
 		renderBuff->bindBase(GL_SHADER_STORAGE_BUFFER, 0);
-		ge::gl::glActiveTexture(GL_TEXTURE0);
-		ge::gl::glBindTexture(GL_TEXTURE_2D, renTex);
-		//renderTex->bind(0);
+		//ge::gl::glActiveTexture(GL_TEXTURE0);
+		//ge::gl::glBindTexture(GL_TEXTURE_2D, renTex);
+		renderTex->bind(0);
 		ge::gl::glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		//renderTex->unbind(0);
 		renderBuff->unbindBase(GL_SHADER_STORAGE_BUFFER, 0);
 		// Draw frame
+
+		w.renderGUI();
 
 		w.swapBuffers();
 	}
@@ -79,6 +81,7 @@ void RayTracing::rayTrace(){
 void RayTracing::init(){
 
 	w.setMouseCallback(mouse_callback);
+	w.initGUI();
 
 	std::ifstream is;
 
@@ -149,8 +152,9 @@ void RayTracing::init(){
 	geomBuff = std::make_shared<ge::gl::Buffer>(sizeof(triangle) * s.getGeometry().size());
 	matBuff = std::make_shared<ge::gl::Buffer>(sizeof(material) * s.getMaterials().size());
 	renderBuff = std::make_shared<ge::gl::Buffer>(sizeof(glm::vec4) * w.getWidth() * w.getHeight());
-	//renderTex = std::make_shared<ge::gl::Texture>(GL_TEXTURE_2D, GL_RGBA32F, 1, 1000, 800);
-	ge::gl::glGenTextures(1, &renTex);
+	renderTex = std::make_shared<ge::gl::Texture>(GL_TEXTURE_2D, GL_RGBA32F, 1, 1000, 800);
+	renderTex->bindImage(0);
+	/*ge::gl::glGenTextures(1, &renTex);
 	ge::gl::glActiveTexture(GL_TEXTURE0);
 	ge::gl::glBindTexture(GL_TEXTURE_2D, renTex);
 	ge::gl::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -158,8 +162,10 @@ void RayTracing::init(){
 	ge::gl::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	ge::gl::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	ge::gl::glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 1000, 800, 0, GL_RGBA, GL_FLOAT, NULL);
-	ge::gl::glBindImageTexture(0, renTex, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+	ge::gl::glBindImageTexture(0, renTex, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);*/
 	
 	// SSBOs
+
+	ge::gl::glEnable(GL_MULTISAMPLE);
 
 }

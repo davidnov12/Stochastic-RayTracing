@@ -3,6 +3,8 @@
 
 #extension GL_ARB_bindless_texture : enable
 
+#define EPS 0.00001
+
 struct Material{
   //sampler2D diffuseTex;
   //sampler2D normalMap;
@@ -54,6 +56,38 @@ layout (std430, binding = 1) buffer out_frame {
 
 uniform vec3 screen_plane[3];
 uniform vec3 view_pos;
+vec3 light_pos = vec3(0, 2, 1);
+Triangle t[2];
+
+bool findCollision(Ray r, out CollisionPoint c);
+
+vec3 computeLighting(CollisionPoint col){
+
+  vec3 lightedPoint = vec3(0);
+  vec3 light_dir = normalize(light_pos - col.position);
+  vec3 view_dir = normalize(view_pos - col.position);
+  vec3 reflect_dir = reflect(-light_dir, col.normal);
+  float amb = 0.3;
+  float diff, spec;
+
+  Ray s;
+  s.origin = col.position + (light_dir * EPS);
+  s.direction = light_dir;
+  CollisionPoint v;
+
+  if(findCollision(s, v)){
+    diff = 0.0;
+    spec = 0.0;
+  }
+  else{
+    diff = max(0.0, dot(light_dir, col.normal));
+    spec = pow(max(dot(view_dir, reflect_dir), 0), 4);
+  }
+
+
+  return (amb + ((1.0 - amb) * diff ) + (0.95 * spec)) * col.color;
+
+}
 
 // Funkce pro ziskani barycentrickych souradnic
 void barycentricInterpolation(Triangle tr, vec3 point, out vec3 bar_coords){
@@ -107,8 +141,29 @@ bool rayTriangleIntersection(Ray ray, Triangle tr, out CollisionPoint inter){
 
 	//inter.color = materials[tr.mat_id].diffuseCol;
 	inter.color = vec3(0.8, 0.1, 0.3);
+  inter.color = vec3(0.2, 0.8, 0.5);
+
+  //inter.color = computeLighting(inter);
 
 	return true;
+}
+
+bool findCollision(Ray r, out CollisionPoint c){
+
+  float closest = 100.0f; CollisionPoint hitPoint; bool res = false;
+
+  for(int i = 0; i < 2; i++){
+    if(rayTriangleIntersection(r, t[i], hitPoint)){
+      if(!res || c.dist < closest){
+        c = hitPoint;
+        closest = c.dist;
+        res = true;
+      }
+    }
+  }
+
+  return res;
+
 }
 
 void main(){
@@ -122,17 +177,26 @@ void main(){
 	r.energy = 1.0;
 
 
-	Triangle t;
-	t.pos_a = vec3(1,0,1); t.pos_b = vec3(0,1,1); t.pos_c = vec3(1,1,0);
+
+	t[0].pos_a = vec3(0.5,0,0.5); t[0].pos_b = vec3(0,0.5,0.5); t[0].pos_c = vec3(0.5,0.5,0);
+  t[0].nor_a = vec3(0, 0.707, 0.707); t[0].nor_b = vec3(0, 0.707, 0.707); t[0].nor_c = vec3(0, 0.707, 0.707);
+
+  t[1].pos_a = vec3(1,-0.5,1); t[1].pos_b = vec3(-1,-0.5,1); t[1].pos_c = vec3(1,-0.5,-1);
+  t[1].nor_a = vec3(0, 1, 0); t[1].nor_b = vec3(0, 1, 0); t[1].nor_c = vec3(0, 1, 0);
+
 	CollisionPoint cp;
 
 	vec4 pixel = vec4(0.8, 0.1, 0.3, 1.0);
 
-	if(rayTriangleIntersection(r, t, cp))
+	/*if(rayTriangleIntersection(r, t, cp))
 		pixel = vec4(cp.color, 1);
 	else
-		pixel = vec4(1);
+		pixel = vec4(1);*/
 
+  if(findCollision(r, cp))
+    pixel = vec4(computeLighting(cp), 1);
+  else
+    pixel = vec4(1);
 
 	ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
 

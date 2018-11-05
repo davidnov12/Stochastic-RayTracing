@@ -1,5 +1,7 @@
 #include "Window.h"
-
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw.h>
+#include <imgui/imgui_impl_opengl3.h>
 
 Window::Window(int width, int height, std::string title, bool createImmediately) {
 	this->width = width;
@@ -13,6 +15,7 @@ Window::Window(int width, int height, std::string title, bool createImmediately)
 
 
 Window::~Window() {
+	destroyGUI();
 	glfwDestroyWindow(window.get());
 	glfwTerminate();
 	window.release();
@@ -35,6 +38,43 @@ void Window::swapBuffers() {
 
 GLFWwindow* Window::getWindow() {
 	return window.get();
+}
+
+void Window::initGUI(){
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	io.Fonts->AddFontFromFileTTF("DroidSans.ttf", 14.0f);
+
+	ImGui_ImplGlfw_InitForOpenGL(window.get(), true);
+	ImGui_ImplOpenGL3_Init();
+	ImGui::StyleColorsDark();
+}
+
+void Window::renderGUI(){
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+
+	ImGui::Begin("Rendering counter");
+	char v;
+	ImGui::ColorButton(&v, ImVec4());
+
+	ImGui::NewLine();
+	ImGui::Text("Raytrace app");
+	
+	ImGui::NewLine();
+
+	ImGui::End();
+
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void Window::destroyGUI(){
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
 }
 
 

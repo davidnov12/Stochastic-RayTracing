@@ -1,13 +1,16 @@
+/*
+
+*/
 #pragma once
 
 #include <iostream>
 #include <string>
 #include <memory>
+
 #include <geGL/geGL.h>
 #include <geGL/StaticCalls.h>
-//#include <GL/glew.h>
-#include <GLFW/glfw3.h>
 
+#include <GLFW/glfw3.h>
 
 
 class Window {
@@ -19,9 +22,8 @@ public:
 	* \param width width of window (in pixels)
 	* \param height height of window (in pixels)
 	* \param title title of window
-	* \param createImmediately if true window will be created immediately, else window must be created manually
 	*/
-	Window(int width, int height, std::string title, bool createImmediately);
+	Window(int width, int height, std::string title);
 
 
 	/**
@@ -49,17 +51,6 @@ public:
 	*/
 	GLFWwindow* getWindow();
 
-	/*
-	*/
-	void initGUI();
-
-	/*
-	*/
-	void renderGUI();
-
-	/*
-	*/
-	void destroyGUI();
 
 	/**
 	* \brief function to get window width
@@ -82,14 +73,6 @@ public:
 
 
 	/**
-	* \brief sets some window property
-	* \param property type of window property
-	* \param value value of setting property
-	*/
-	void setWindowProperty(int property, int value);
-
-
-	/**
 	* \brief sets window properties to default values
 	*/
 	void setDefaults();
@@ -101,54 +84,21 @@ public:
 	*/
 	bool createWindow();
 
+	/*
+	*
+	*/
+	bool isResized();
 
 	/**
-	* \brief allow to enable some feature (depth_test, blend etc.)
-	* \param feature type of enabling feature
+	* 
 	*/
-	void enableFeature(int feature);
+	void showWindow();
 
-
-	/**
-	* \brief
-	* \param function
+	/*
+	* 
 	*/
-	void setKeyCallback(GLFWkeyfun function);
+	void checkViewportResize();
 
-
-	/**
-	* \brief
-	* \param function
-	*/
-	void setMouseCallback(GLFWcursorposfun function);
-
-
-	/**
-	* \brief
-	* \param function
-	*/
-	void setCursorCallback(GLFWcursorposfun function);
-
-
-	/**
-	* \brief
-	* \param function
-	*/
-	void setResizeCallback(GLFWwindowsizefun function);
-
-
-	/**
-	* \brief
-	* \param function
-	*/
-	void setWindowRefreshCallback(GLFWwindowrefreshfun function);
-
-
-	/**
-	* \brief
-	* \param function
-	*/
-	void setScrollCallback(GLFWscrollfun function);
 
 private:
 
@@ -162,7 +112,8 @@ private:
 
 
 	int width, height;
+	bool viewportResize = false;
 	std::string title;
 	std::unique_ptr<GLFWwindow, DestroyWin> window;
-
+	//std::shared_ptr<GLFWwindow> window;
 };

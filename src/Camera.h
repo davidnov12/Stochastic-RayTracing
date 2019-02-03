@@ -1,3 +1,8 @@
+/*
+Projekt PGPa + GMU
+David Novák, xnovak1l
+2018
+*/
 #pragma once
 
 #include <glm/glm.hpp>
@@ -27,7 +32,7 @@ public:
 	* \brief
 	*/
 	Camera() {
-		this->position = glm::vec3(0.0f, 0.0f, 0.5f);
+		this->position = glm::vec3(0.0f, 1.0f, 0.5f);
 		this->worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 		this->yaw = 0.0f;
 		this->pitch = 0.0f;
@@ -106,26 +111,10 @@ public:
 
 	/**
 	* \brief
-	* \param dir
-	* \param delta
-	*/
-	virtual void keyboardEventQuick(int dir, float delta) {}
-
-
-	/**
-	* \brief
 	* \param x
 	* \param y
 	*/
 	virtual void mouseEvent(float x, float y) {}
-
-
-	/**
-	* \brief
-	* \param x
-	* \param y
-	*/
-	virtual void mouseEventQuick(float x, float y) {}
 
 
 	/**
@@ -135,7 +124,7 @@ public:
 	virtual void scrollEvent(float y) {}
 
 
-protected:
+//protected:
 
 	const float ZOOM = 45.0f;
 	const float SPEED = 0.5f;//2.0f;

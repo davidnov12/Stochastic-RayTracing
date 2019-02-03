@@ -1,10 +1,17 @@
-#include "FPSCamera.h"
+/*
+Projekt PGPa + GMU
+David Novák, xnovak1l
+2018
+*/
+#include <FPSCamera.h>
+
 #include <iostream>
 
 FPSCamera::FPSCamera() {}
 
 
 FPSCamera::~FPSCamera() {}
+
 
 std::vector<glm::vec3> FPSCamera::getScreenCoords() {
 
@@ -13,13 +20,16 @@ std::vector<glm::vec3> FPSCamera::getScreenCoords() {
 	glm::vec3 tmp = (position - right - up) + (2.0f * front);
 	scrCoords.push_back(glm::vec3(tmp.x, tmp.y, tmp.z));
 
-	tmp += 2.0f * up;
+	//tmp += 2.0f * up;
+	tmp = (position - right + up) + (2.0f * front);
 	scrCoords.push_back(glm::vec3(tmp.x, tmp.y, tmp.z));
 
-	tmp += (-2.0f * up) + (2.0f * right);
+	//tmp += (-2.0f * up) + (2.0f * right);
+	tmp = (position + right - up) + (2.0f * front);
 	scrCoords.push_back(glm::vec3(tmp.x, tmp.y, tmp.z));
 
-	tmp += 2.0f * up;
+	//tmp += 2.0f * up;
+	tmp = (position + right + up) + (2.0f * front);
 	scrCoords.push_back(glm::vec3(tmp.x, tmp.y, tmp.z));
 
 	return scrCoords;
@@ -45,12 +55,6 @@ void FPSCamera::keyboardEvent(cameraMove dir, float delta) {
 }
 
 
-void FPSCamera::keyboardEventQuick(int dir, float delta) {
-	float distance = delta + delta;
-	position += (dir * distance);
-}
-
-
 void FPSCamera::mouseEvent(float x, float y) {
 
 	yaw += (SENS * x);
@@ -62,28 +66,9 @@ void FPSCamera::mouseEvent(float x, float y) {
 	if (pitch < -89.f)
 		pitch = -89.f;
 
-	//std::cout << yaw << " " << pitch << std::endl;
-
 	updateVectors();
 }
 
-
-void FPSCamera::mouseEventQuick(float x, float y) {
-
-	if (x != 0)
-		yaw += (SENS * x);
-
-	if (y != 0)
-		pitch += (SENS * y);
-
-	if (pitch > pitchConstrain)
-		pitch = pitchConstrain;
-
-	if (pitch < -pitchConstrain)
-		pitch = -pitchConstrain;
-
-	updateVectors();
-}
 
 
 void FPSCamera::scrollEvent(float y) {

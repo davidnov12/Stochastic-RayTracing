@@ -1,6 +1,12 @@
+/*
+Projekt PGPa + GMU
+David Novák, xnovak1l
+2018
+*/
 #pragma once
 
-#include "Camera.h"
+#include <Camera.h>
+
 #include <vector>
 
 
@@ -23,7 +29,8 @@ public:
 	~FPSCamera();
 
 
-
+	/*
+	*/
 	std::vector<glm::vec3> getScreenCoords();
 
 
@@ -37,26 +44,11 @@ public:
 
 	/**
 	* \brief
-	* \param dir
-	* \param delta
-	*/
-	virtual void keyboardEventQuick(int dir, float delta) override;
-
-
-	/**
-	* \brief
 	* \param x
 	* \param y
 	*/
 	virtual void mouseEvent(float x, float y) override;
 
-
-	/**
-	* \brief
-	* \param x
-	* \param y
-	*/
-	virtual void mouseEventQuick(float x, float y) override;
 
 
 	/**

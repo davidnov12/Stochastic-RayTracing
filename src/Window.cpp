@@ -1,24 +1,21 @@
-#include "Window.h"
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw.h>
-#include <imgui/imgui_impl_opengl3.h>
+/*
 
-Window::Window(int width, int height, std::string title, bool createImmediately) {
+*/
+#include <Window.h>
+
+Window::Window(int width, int height, std::string title) {
 	this->width = width;
 	this->height = height;
 	this->title = title;
-
-	if (createImmediately)
-		setDefaults(), createWindow();
-
 }
 
 
 Window::~Window() {
-	destroyGUI();
+	//destroyGUI();
+	window.reset();
 	glfwDestroyWindow(window.get());
 	glfwTerminate();
-	window.release();
+	//window.reset();
 }
 
 
@@ -27,6 +24,7 @@ bool Window::isClosed() {
 		return true;
 
 	glfwPollEvents();
+	checkViewportResize();
 	return false;
 }
 
@@ -38,43 +36,6 @@ void Window::swapBuffers() {
 
 GLFWwindow* Window::getWindow() {
 	return window.get();
-}
-
-void Window::initGUI(){
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	io.Fonts->AddFontFromFileTTF("DroidSans.ttf", 14.0f);
-
-	ImGui_ImplGlfw_InitForOpenGL(window.get(), true);
-	ImGui_ImplOpenGL3_Init();
-	ImGui::StyleColorsDark();
-}
-
-void Window::renderGUI(){
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplGlfw_NewFrame();
-	ImGui::NewFrame();
-
-	ImGui::Begin("Rendering counter");
-	char v;
-	ImGui::ColorButton(&v, ImVec4());
-
-	ImGui::NewLine();
-	ImGui::Text("Raytrace app");
-	
-	ImGui::NewLine();
-
-	ImGui::End();
-
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-}
-
-void Window::destroyGUI(){
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
-	ImGui::DestroyContext();
 }
 
 
@@ -90,11 +51,6 @@ int Window::getHeight() {
 
 void Window::makeContextCurrent() {
 	glfwMakeContextCurrent(window.get());
-}
-
-
-void Window::setWindowProperty(int property, int value) {
-	glfwWindowHint(property, value);
 }
 
 
@@ -128,37 +84,31 @@ bool Window::createWindow() {
 	return true;
 }
 
+bool Window::isResized(){
 
-void Window::enableFeature(int feature) {
-	ge::gl::glEnable(feature);
+	if (!viewportResize)
+		return false;
+
+	viewportResize = false;
+	return true;
 }
 
 
-void Window::setKeyCallback(GLFWkeyfun function) {
-	glfwSetKeyCallback(window.get(), function);
+void Window::showWindow() {
+	setDefaults();
+	if (!createWindow()) throw std::exception("Cannot create window\n");
 }
 
+void Window::checkViewportResize(){
 
-void Window::setMouseCallback(GLFWcursorposfun function) {
-	glfwSetCursorPosCallback(window.get(), function);
-}
+	int w, h;
 
+	glfwGetFramebufferSize(window.get(), &w, &h);
 
-void Window::setCursorCallback(GLFWcursorposfun function) {
-	glfwSetCursorPosCallback(window.get(), function);
-}
-
-
-void Window::setResizeCallback(GLFWwindowsizefun function) {
-	glfwSetWindowSizeCallback(window.get(), function);
-}
-
-
-void Window::setWindowRefreshCallback(GLFWwindowrefreshfun function) {
-	glfwSetWindowRefreshCallback(window.get(), function);
-}
-
-
-void Window::setScrollCallback(GLFWscrollfun function) {
-	glfwSetScrollCallback(window.get(), function);
+	if(w != width || h != height){
+		viewportResize = true;
+		width = w;
+		height = h;
+		ge::gl::glViewport(0, 0, width, height);
+	}
 }
